@@ -8,6 +8,7 @@ import com.ahmad.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -36,27 +37,25 @@ public class ProductController {
 
     @PostMapping("/newUser")
     public ResponseEntity<?> addNewUser(@RequestBody UserInfo userInfo) {
-        System.out.println("printing userInfo: " + userInfo.toString());
-        System.out.println("IM HERE DUDE!!");
         return service.addUser(userInfo);
     }
-
+    @GetMapping("/all")
+    public List<Product> getAllTheProducts() {
+        System.out.println("im in admin");
+        return service.getProducts();
+    }
+    @GetMapping("/{id}")
+    public Optional<Product> getProductById(@PathVariable int id) {
+        System.out.println("im in user");
+        return service.getProduct(id);
+    }
     @PostMapping("/newProduct")
     public ResponseEntity<?> addProduct(@RequestBody Product productInfo){
         System.out.println("IM HERE");
         return service.addProduct( productInfo );
     }
-    @GetMapping("/all")
-//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public List<Product> getAllTheProducts() {
-        return service.getProducts();
-    }
 
-    @GetMapping("/{id}")
-//    @PreAuthorize("hasAuthority('ROLE_USER')")
-    public Optional<Product> getProductById(@PathVariable int id) {
-        return service.getProduct(id);
-    }
+
 
 
     @PostMapping("/authenticate")
@@ -66,7 +65,7 @@ public class ProductController {
             String token = jwtService.generateToken(authRequest.getName());
             System.out.println(authentication.getAuthorities());
             System.out.println(authRequest);
-            return ResponseEntity.status(HttpStatus.CREATED).body("token: " + token );
+            return ResponseEntity.status(HttpStatus.FOUND).body("token: " + token );
         } else {
             return ResponseEntity.status( HttpStatus.UNAUTHORIZED).body( "wrong info" );
         }

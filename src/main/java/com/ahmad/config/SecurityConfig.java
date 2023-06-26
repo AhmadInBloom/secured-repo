@@ -42,18 +42,17 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http.securityMatcher( "/product/all");
         http.csrf(csrf -> {
             try {
-                csrf .disable().sessionManagement(session -> session.sessionCreationPolicy( SessionCreationPolicy.STATELESS))
+                csrf .disable()
                         .authorizeHttpRequests(auth -> {
-                            auth.requestMatchers( "/{id}" ).hasRole( "USER" );
-                            auth.requestMatchers( "/all" ).hasRole( "ADMIN" );
-//                            auth.requestMatchers( "/welcome" ).permitAll();
-                            auth.anyRequest()
-                                    .permitAll();
+                            auth.requestMatchers( "/product/{id}" ).hasAuthority( "USER" );
+                            auth.requestMatchers( "/product/all" ).hasAuthority( "ADMIN" );
+                            auth.requestMatchers( "/product/newProduct" ).hasAuthority( "USER" ).anyRequest().permitAll();
 
-
-                        });
+//
+                        }).sessionManagement(session -> session.sessionCreationPolicy( SessionCreationPolicy.STATELESS));
             } catch (Exception e) {
                 throw new RuntimeException( e );
             }
